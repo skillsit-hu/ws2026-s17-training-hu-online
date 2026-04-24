@@ -11,8 +11,8 @@ This competition has **four** separate tasks. Together they cover a self-contain
 
 | Day            | Module | Focus                                                     |
 | -------------- | ------ | --------------------------------------------------------- |
-| Tue 04/28 (C1) | **A**  | Speed test (HTML, CSS, JavaScript, TypeScript)            |
-| Tue 04/28 (C1) | **B**  | Frontend Game — **The Developer’s Learning Path**         |
+| Tue 04/28 (C1) | **A**  | Frontend Game — **The Developer’s Learning Path**         |
+| Tue 04/28 (C1) | **B**  | Speed test (HTML, CSS, JavaScript, TypeScript)            |
 | Wed 04/29 (C2) | **C**  | Backend — SkillShare Academy **content service** REST API |
 | Wed 04/29 (C2) | **D**  | Frontend — SkillShare Academy **LMS** (learning site) SPA |
 
