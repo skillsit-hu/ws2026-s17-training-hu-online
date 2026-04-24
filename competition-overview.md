@@ -35,7 +35,7 @@ You can solve the tasks by developing them on your own machine.
 
 ### Gitea, git
 
-The Gitea service is available at the following address: [https://git.ssa.skillsit.hu](https://gitea.ssa.skillsit.hu)
+The Gitea service is available at the following address: [https://git.ssa.skillsit.hu](https://git.ssa.skillsit.hu)
 
 For **all four** tasks, you can start from a selected template repo on Gitea.
 
