@@ -85,7 +85,11 @@ The Laravel project contains all the necessary files, so you will not need to `c
 
 When you commit and push your work, the deployment will start automatically. You can follow the process in the Gitea interface under the Action tab. Once the deployment is complete, your project will be available at https://cXX-YYYY-module-Z.ssa.skillsit.hu, where `X` is your workstation number, `YYYY` is your 4 digit pin, and `Z` is the module letter.
 
+Competitors can also check the container logs of their deployed projects at [https://logs.ssa.skillsit.hu/](https://logs.ssa.skillsit.hu/). To log in, use your PIN.
+
 
 ### Database access
 
 You will have your own database on the MySQL database server (`db.ssa.skillsit.hu`) available on the local network. You will need to use this database for development, and the same database will provide the data for your projects deployed to the server. A database dump will be provided to get the initial data. During the marking, the database will be restored to its original state using the same dump. Your backend solution (Module C) uses this database.
+
+You can use PHPMyAdmin to manage your databases at [https://pma.ssa.skillsit.hu](https://pma.ssa.skillsit.hu). Log in with the same credentials you use for Gitea. The database naming convention is `cXX_module-y`, where `cXX` is your username and `y` is the module letter (e.g. `c07_module-c`).
