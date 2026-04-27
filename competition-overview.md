@@ -41,21 +41,20 @@ For **all four** tasks, you can start from a selected template repo on Gitea.
 
 The available template repos:
 
-- react-app
-- react-ts-app
-- vue-app
-- vue-ts-app
-- node-app
-- node-ts-app
-- laravel-app
-- vanilla-js-app
+- react
+- react-ts
+- vue
+- vue-ts
+- node
+- node-ts
+- laravel
+- vanilla-js
+- node-ts-prisma
 
 To log in, you must use the username and password (a 4-digit PIN code) you have been given.
 After logging in, create a new repo for the next task.
-
-- In the Owner field, select `competitors` team! **Make sure you set this option carefully because if you set your own user as the owner, the automatic deployment will not work!**
-- Give the name of the new repo using the following pattern: `module-X-Y`, where `X` is the module letter, and `Y` is your workstation number. **Make sure you set the repo's name carefully because if you make a mistake, the automatic deployment will not work!** _(Example: module-a-1)_
-- Under the template field, select the appropriate template (e.g. `react-ts-app`). Select `Git Content (Default Branch)` for `Template Items`.
+- Give the name of the new repo using the following pattern: `module-Y`, where `Y` is the module's letter (eg. `module-a`, `module-b`). **Make sure you set the repo's name carefully because if you make a mistake, the automatic deployment will not work!**
+- Under the template field, select the appropriate template (e.g. `react-ts`). Select `Git Content (Default Branch)` for `Template Items`.
 
 Once the new repo is created, clone it to your own workstation.
 
@@ -84,7 +83,8 @@ The Laravel project contains all the necessary files, so you will not need to `c
 
 ### Deployment
 
-When you commit and push your work, the deployment will start automatically. You can follow the process in the Gitea interface under the Action tab. Once the deployment is complete, your project will be available at `https://module-X-YYYY.ssa.skillsit.hu`, where `X` is the module letter and `YYYY` is your 4-digit PIN.
+When you commit and push your work, the deployment will start automatically. You can follow the process in the Gitea interface under the Action tab. Once the deployment is complete, your project will be available at https://cXX-YYYY-module-Z.ssa.skillsit.hu, where `X` is your workstation number, `YYYY` is your 4 digit pin, and `Z` is the module letter.
+
 
 ### Database access
 
