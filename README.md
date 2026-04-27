@@ -38,7 +38,7 @@ The module tasks are based on the test projects from the 2026 WorldSkills Hungar
 
 ## Test Project
 
-- [Overview](modules-overview.md)
+- [Overview](competition-overview.md)
 - [Module A - Interactive Frontend Application](module-a.md)
 - [Module B - Speed Test](module-b.md)
 - [Module C - Backend](module-c.md)
