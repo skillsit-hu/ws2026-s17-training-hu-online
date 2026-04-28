@@ -73,13 +73,13 @@
 
 给定一组课程报名数据。请实现函数 `getTopCourses(enrollments, topN)`，根据报名人数返回前 N 门课程。函数应返回课程名称与报名人数组成的数组，并按报名人数降序排列。
 
-请查看 [/assets/module-a/c1/index.js](/assets/module-a/c1/index.js) 文件。
+请查看 [/assets/module-b/c1/index.js](/assets/module-b/c1/index.js) 文件。
 
 ### C2: 数组分块 (中等)
 
 实现函数 `chunkArray(array, chunkSize)`，该函数接收一个数组和分块大小作为参数，并返回一个新数组，其中原数组会按指定分块大小拆分为多个子数组。如果原数组元素总数不能被分块大小整除，则最后一个分块可以包含更少元素。
 
-请查看 [/assets/module-a/c2/index.js](/assets/module-a/c2/index.js) 文件。
+请查看 [/assets/module-b/c2/index.js](/assets/module-b/c2/index.js) 文件。
 
 ### C3: 两数之和 (困难)
 
@@ -89,4 +89,4 @@
 
 你可以假设**恰好存在一组**正确答案。
 
-请查看 [/assets/module-a/c3/index.js](/assets/module-a/c3/index.js) 文件。
+请查看 [/assets/module-b/c3/index.js](/assets/module-b/c3/index.js) 文件。
