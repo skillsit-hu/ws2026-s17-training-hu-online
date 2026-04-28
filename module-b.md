@@ -73,13 +73,13 @@ Note that the exported drawing should have a white background so that the user's
 
 You are given a list of course enrollments. Implement a function `getTopCourses(enrollments, topN)` that returns the top N courses based on the number of enrollments. The function should return an array of course names and enrollment counts sorted by enrollment count in descending order.
 
-Please see the [/assets/module-a/c1/index.js](/assets/module-a/c1/index.js) file.
+Please see the [/assets/module-b/c1/index.js](/assets/module-b/c1/index.js) file.
 
 ### C2: Array chunking (Medium)
 
 Implement a function `chunkArray(array, chunkSize)` that takes an array and a chunk size as arguments and returns a new array where the original array is divided into subarrays of the specified chunk size. The last chunk may contain fewer elements if the total number of elements in the original array is not perfectly divisible by the chunk size.
 
-Please see the [/assets/module-a/c2/index.js](/assets/module-a/c2/index.js) file.
+Please see the [/assets/module-b/c2/index.js](/assets/module-b/c2/index.js) file.
 
 ### C3: Two numbers that add up (Hard)
 
@@ -89,4 +89,4 @@ Find **two different positions** in the list such that the values at those posit
 
 You may assume there is **exactly one** correct pair.
 
-Please see the [/assets/module-a/c3/index.js](/assets/module-a/c3/index.js) file.
+Please see the [/assets/module-b/c3/index.js](/assets/module-b/c3/index.js) file.
