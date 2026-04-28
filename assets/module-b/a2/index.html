@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My MacBook Pro</title>
+
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        height: 100vh;
+        overflow: hidden;
+        background-image: url("images/bigsur.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      .taskbar {
+        position: absolute;
+        left: 50%;
+        bottom: 16px;
+        transform: translateX(-50%);
+        background-color: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-bottom-color: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        border-radius: 12px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+      }
+      .taskbar img {
+        height: 60px;
+        cursor: pointer;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+        flex-shrink: 0;
+        padding: 0 6px;
+        transition: 0.2s;
+      }
+
+      /* Your code here */
+    </style>
+  </head>
+  <body>
+    <div class="taskbar">
+      <img src="images/calculator.png" alt="Calculator" />
+      <img src="images/photos.png" alt="Photos" />
+      <img src="images/finder.png" alt="Finder" />
+      <img src="images/app-store.png" alt="App Store" />
+      <img src="images/podcasts.png" alt="Podcasts" />
+      <img src="images/facetime.png" alt="Facetime" />
+      <img src="images/messages.png" alt="Messages" />
+      <img src="images/safari.png" alt="Safari" />
+      <img src="images/music.png" alt="Apple Music" />
+      <img src="images/home.png" alt="Home" />
+      <img src="images/contacts.png" alt="Contacts" />
+      <img src="images/calendar.png" alt="Calendar" />
+    </div>
+  </body>
+</html>
