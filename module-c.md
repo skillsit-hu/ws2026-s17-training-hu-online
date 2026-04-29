@@ -67,7 +67,7 @@ The payload must contain at least:
 **Long-lived test token (~7 days):** For testing without repeated login, you can use this pre-issued Bearer token for **alice@example.com** (payload subject `1`). It is valid for approximately **seven days** from issuance (see `exp`).
 
 ```
-eyJhbGciOiJIUzI1NiIsInR5cCI6IlNTQSJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc1MTYyNzA0fQ.xGCNwuEthwy6iGWkS8FkCk5Wm9VYV7cLF41T6CLl_b0
+eyJhbGciOiJIUzI1NiIsInR5cCI6IlNTQSJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc4NjUxNjI5fQ.SupdoOSna89QLZejnwZMHTUqsS7lPC_OWvY3Q7_RXIU
 ```
 
 Use it in `Authorization: Bearer <token>` or when opening the LMS with `?token=<token>`. Normal dashboard login still issues **60-second** tokens; this token is only for development and manual testing convenience.
@@ -116,7 +116,6 @@ Content is composed of the following types of content blocks in various combinat
 
 Content blocks are **stored in the database** in the `content_blocks` table. Each content block is a row with the following fields:
 
-
 | Field       | Type                                                            | Description                                |
 | ----------- | --------------------------------------------------------------- | ------------------------------------------ |
 | id          | integer                                                         | Primary key                                |
@@ -128,9 +127,7 @@ Content blocks are **stored in the database** in the `content_blocks` table. Eac
 | url         | string                                                          | URL for image, video, or link blocks       |
 | raw_text    | longtext                                                        | Raw rich text content for paragraph blocks |
 
-
 **Example:** A chapter with four content blocks (order preserved by `order_index`):
-
 
 | id  | chapter_id | type      | order_index | text              | img_alt                         | url                                                                                                            | raw_text |
 | --- | ---------- | --------- | ----------- | ----------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------- | -------- |
@@ -139,11 +136,9 @@ Content blocks are **stored in the database** in the `content_blocks` table. Eac
 | 3   | 3          | image     | 3           | NULL              | HTML document structure diagram | [https://content.example.com/images/html-structure.png](https://content.example.com/images/html-structure.png) | NULL     |
 | 4   | 3          | link      | 4           | MDN Documentation | NULL                            | [https://developer.mozilla.org/en-US/docs/Web/HTML](https://developer.mozilla.org/en-US/docs/Web/HTML)         | NULL     |
 
-
 ### Paragraph Rich Text Format
 
 Rich text paragraphs are **stored in the database** in a separate `chunks` table. Each chunk is a row with the following fields:
-
 
 | Field  | Type    | Description                |
 | ------ | ------- | -------------------------- |
@@ -151,17 +146,14 @@ Rich text paragraphs are **stored in the database** in a separate `chunks` table
 | bold   | boolean | Whether the text is bold   |
 | italic | boolean | Whether the text is italic |
 
-
 When returned via the API, these are parsed to HTML, so the frontend receives HTML ready for display.
 
 **Example:** Two chunks stored in the database (order preserved by `orderIndex`):
-
 
 | orderIndex | text              | bold  | italic |
 | ---------- | ----------------- | ----- | ------ |
 | 1          | "CSS allows you " | false | false  |
 | 2          | "to style"        | true  | false  |
-
 
 Parsed to HTML: `<p>CSS allows you <strong>to style</strong></p>`.
 
@@ -169,18 +161,16 @@ Parsed to HTML: `<p>CSS allows you <strong>to style</strong></p>`.
 
 Chapter learning content (blocks, rendered rich text, media, and the chapter quiz) is returned by the content service as a single response:
 
-
 | Method | Path                                     | Auth                  |
 | ------ | ---------------------------------------- | --------------------- |
 | `GET`  | `/api/courses/:slug/chapters/:chapterId` | Bearer token required |
 
-
 **Behaviour (summary):**
 
 - Loads all `content_blocks` for the requested chapter, ordered by `order_index`.
-- `**h1`-`h4`:** heading text from `text` (and related fields as needed).
-- `**paragraph` / `list_item`:** rich text is assembled from the linked `chunks` rows (see above) on the server; the API exposes `type` `paragraph` or `list_item`, `html`, and `rawText` (from `raw_text`), consistent with the response schema below. Chunk rows are not returned in the JSON.
-- `**image`, `video`, `link`:** use `url`, `img_alt` for images, and titles for video/link where applicable.
+- `**h1`-`h4`:\*\* heading text from `text` (and related fields as needed).
+- `**paragraph` / `list_item`:\*\* rich text is assembled from the linked `chunks` rows (see above) on the server; the API exposes `type` `paragraph` or `list_item`, `html`, and `rawText` (from `raw_text`), consistent with the response schema below. Chunk rows are not returned in the JSON.
+- `**image`, `video`, `link`:\*\* use `url`, `img_alt` for images, and titles for video/link where applicable.
 - The same response includes the chapter **quiz** and metadata (e.g. credits), as required by the LMS.
 
 Sequential access (previous chapter completed), enrollment, full JSON examples, and error codes (`404`, `403`, etc.) are specified under **[Chapter/Module Content](#chaptermodule-content)**.
@@ -258,10 +248,7 @@ erDiagram
     }
 ```
 
-
-
 #### Table Descriptions
-
 
 | Table              | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -271,7 +258,6 @@ erDiagram
 | **chunks**         | Optional rows for fine-grained rich text inside a `paragraph` or `list_item` block (`text`, `bold`, `italic`). `order_index` orders segments within that block. If not used, HTML may be supplied only via `content_blocks.raw_text` / `text`.                                                                                                                                                                                                                                                     |
 | **quiz_questions** | Quiz questions for a chapter. `order_index` defines display order.                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | **quiz_options**   | Multiple-choice options. `option_id` (e.g. "a", "b", "c") matches the API. `is_correct` is used only for validation; never exposed to clients.                                                                                                                                                                                                                                                                                                                                                     |
-
 
 ## Requirements
 
@@ -300,7 +286,7 @@ The content service endpoints must handle errors and return the appropriate HTTP
 #### General rules for the content service API
 
 - The example response bodies contain example data structures. Dynamic data from the content service's own storage should be used.
-- Placeholder parameters in the URL are marked with a preceding colon *(e.g. :id)*
+- Placeholder parameters in the URL are marked with a preceding colon _(e.g. :id)_
 - The order of properties in objects does not matter, but the order in an array does.
 - The `Content-Type` header of a response is always `application/json` unless specified otherwise.
 - The given URLs are relative to the content service base (e.g. `/api`).
@@ -521,7 +507,6 @@ Returns the full content of one chapter (module): metadata, ordered content elem
 
 **Content array:** Items follow `content_blocks.order_index` (exposed as `orderIndex` on each item). Types mirror storage and LMS needs:
 
-
 | `type`                   | Source / fields                                                                                                                                                                                  |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `h1`, `h2`, `h3`, `h4`   | `orderIndex`, plain heading text in `text` (from the block's `text` column).                                                                                                                     |
@@ -529,7 +514,6 @@ Returns the full content of one chapter (module): metadata, ordered content elem
 | `image`                  | `orderIndex`, `url`, `alt` (from `url`, `img_alt`).                                                                                                                                              |
 | `video`                  | `orderIndex`, `url`, `title` (e.g. from `url` and `text`).                                                                                                                                       |
 | `link`                   | `orderIndex`, `url`, `title`                                                                                                                                                                     |
-
 
 The correct answer for each quiz question must **not** appear in this response; it is used only by the quiz validation endpoint.
 
@@ -617,12 +601,10 @@ Validates submitted quiz answers. The main backend invokes this endpoint to veri
 
 #### Course administration
 
-
 | Method | Path               | Auth                  |
 | ------ | ------------------ | --------------------- |
 | `POST` | `/api/courses`     | Bearer token required |
 | `PUT`  | `/api/courses/:id` | Bearer token required |
-
 
 `:id` is the course **numeric primary key** (not the slug).
 
@@ -633,14 +615,12 @@ Creates a new course with **no chapters** initially (`totalChapters` and `totalC
 **Request body:** send `**title`** and `**slug**` as **top-level** JSON properties (not inside `course`). Optional: `description`, `difficulty`.  
 You may also nest the same fields under `**course`** (e.g. `{ "course": { "title": "...", "slug": "..." } }`) for symmetry with the response.
 
-
 | Field         | Required | Description                                                         |
 | ------------- | -------- | ------------------------------------------------------------------- |
 | `title`       | yes      | Non-empty string                                                    |
 | `slug`        | yes      | Unique URL slug (pattern as above)                                  |
 | `description` | no       | String or omit; may be `null`                                       |
 | `difficulty`  | no       | One of `beginner`, `intermediate`, `advanced` (default: `beginner`) |
-
 
 **Request example (`Content-Type: application/json`):**
 
@@ -681,14 +661,12 @@ Updates one or more metadata fields on the course with the given **numeric id**.
 
 **Request body (any subset):**
 
-
-| Field         | Description                              |
-| ------------- | ---------------------------------------- |
-| `title`       | Non-empty string                         |
-| `slug`        | New unique slug (same pattern as POST)   |
-| `description` | String or `null`                         |
-| `difficulty`  | `beginner` | `intermediate` | `advanced` |
-
+| Field         | Description                            |
+| ------------- | -------------------------------------- | -------------- | ---------- |
+| `title`       | Non-empty string                       |
+| `slug`        | New unique slug (same pattern as POST) |
+| `description` | String or `null`                       |
+| `difficulty`  | `beginner`                             | `intermediate` | `advanced` |
 
 **Request example (`Content-Type: application/json`)** - include **at least one** field; partial updates are allowed:
 
@@ -748,7 +726,6 @@ Module C will be assessed using automated tools that directly access the content
 
 ## Mark distribution
 
-
 | WSOS SECTION | Description                            | Points |
 | ------------ | -------------------------------------- | ------ |
 | 1            | Work organization and self-management  | 1      |
@@ -757,5 +734,3 @@ Module C will be assessed using automated tools that directly access the content
 | 4            | Front-End Development                  | 0      |
 | 5            | Back-End Development                   | 25.75  |
 | **Total**    |                                        | 30     |
-
-

@@ -67,7 +67,7 @@ payload 至少必须包含：
 **长效测试 token（约 7 天）：** 为了避免反复登录进行测试，你可以使用这个预签发的 Bearer token，它属于 **[alice@example.com](mailto:alice@example.com)**（payload subject 为 `1`）。它从签发时起大约**七天**内有效（见 `exp`）。
 
 ```text
-eyJhbGciOiJIUzI1NiIsInR5cCI6IlNTQSJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc1MTYyNzA0fQ.xGCNwuEthwy6iGWkS8FkCk5Wm9VYV7cLF41T6CLl_b0
+eyJhbGciOiJIUzI1NiIsInR5cCI6IlNTQSJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc4NjUxNjI5fQ.SupdoOSna89QLZejnwZMHTUqsS7lPC_OWvY3Q7_RXIU
 ```
 
 可在 `Authorization: Bearer <token>` 中使用它，或在打开 LMS 时通过 `?token=<token>` 使用。正常的仪表盘登录仍会签发 **60 秒** token；该 token 仅用于开发和手动测试便利。
@@ -116,16 +116,16 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IlNTQSJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc1MTYyNzA0fQ.xGCN
 
 内容块**存储在数据库**的 `content_blocks` 表中。每个内容块是一行，包含以下字段：
 
-| 字段        | 类型                                                            | 描述                                  |
-| ----------- | --------------------------------------------------------------- | ------------------------------------- |
-| id          | integer                                                         | 主键                                  |
-| chapter_id  | integer                                                         | 引用章节的外键                        |
-| type        | enum (h1, h2, h3, h4, paragraph, list_item, image, video, link) | 内容块类型                            |
-| order_index | integer                                                         | 在章节中的显示顺序                    |
-| text        | string                                                          | 标题文本（h1-h4）或段落标签           |
-| img_alt     | string                                                          | 图片替代文本                          |
-| url         | string                                                          | 图片、视频或链接块的 URL              |
-| raw_text    | longtext                                                        | 段落块的原始富文本内容                |
+| 字段        | 类型                                                            | 描述                        |
+| ----------- | --------------------------------------------------------------- | --------------------------- |
+| id          | integer                                                         | 主键                        |
+| chapter_id  | integer                                                         | 引用章节的外键              |
+| type        | enum (h1, h2, h3, h4, paragraph, list_item, image, video, link) | 内容块类型                  |
+| order_index | integer                                                         | 在章节中的显示顺序          |
+| text        | string                                                          | 标题文本（h1-h4）或段落标签 |
+| img_alt     | string                                                          | 图片替代文本                |
+| url         | string                                                          | 图片、视频或链接块的 URL    |
+| raw_text    | longtext                                                        | 段落块的原始富文本内容      |
 
 **示例：** 一个包含四个内容块的章节（顺序由 `order_index` 保留）：
 
@@ -140,11 +140,11 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IlNTQSJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc1MTYyNzA0fQ.xGCN
 
 富文本段落**存储在数据库**的独立 `chunks` 表中。每个 chunk 是一行，包含以下字段：
 
-| 字段   | 类型    | 描述                 |
-| ------ | ------- | -------------------- |
-| text   | string  | 文本内容             |
-| bold   | boolean | 文本是否加粗         |
-| italic | boolean | 文本是否斜体         |
+| 字段   | 类型    | 描述         |
+| ------ | ------- | ------------ |
+| text   | string  | 文本内容     |
+| bold   | boolean | 文本是否加粗 |
+| italic | boolean | 文本是否斜体 |
 
 通过 API 返回时，这些内容会被解析为 HTML，因此前端会收到可直接展示的 HTML。
 
@@ -161,8 +161,8 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IlNTQSJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzc1MTYyNzA0fQ.xGCN
 
 章节学习内容（块、渲染后的富文本、媒体和章节测验）由内容服务作为单个响应返回：
 
-| Method | Path                                     | Auth             |
-| ------ | ---------------------------------------- | ---------------- |
+| Method | Path                                     | Auth              |
+| ------ | ---------------------------------------- | ----------------- |
 | `GET`  | `/api/courses/:slug/chapters/:chapterId` | 需要 Bearer token |
 
 **行为（摘要）：**
@@ -250,14 +250,14 @@ erDiagram
 
 #### 表说明
 
-| 表                 | 描述                                                                                                                                                                                                                                                                                                                                                             |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **courses**        | 课程目录。`slug` 是唯一的（URL 片段）。`difficulty`：`beginner`、`intermediate`、`advanced`。`total_chapters` 和 `total_credits` 是存储列（维护为与章节数据一致）。                                                                                                                                                                                                |
-| **chapters**       | 课程内的学习模块。`order_index` 定义顺序。每个章节都有内容块和测验。                                                                                                                                                                                                                                                                                              |
+| 表                 | 描述                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **courses**        | 课程目录。`slug` 是唯一的（URL 片段）。`difficulty`：`beginner`、`intermediate`、`advanced`。`total_chapters` 和 `total_credits` 是存储列（维护为与章节数据一致）。                                                                                                                                                                                                                                                                   |
+| **chapters**       | 课程内的学习模块。`order_index` 定义顺序。每个章节都有内容块和测验。                                                                                                                                                                                                                                                                                                                                                                  |
 | **content_blocks** | 按章节顺序排列的内容元素（`order_index`）。`type`：`h1`-`h4`、`paragraph`、`list_item`、`image`、`video`、`link`。列包括 `text`、`img_alt`、`url`、`raw_text`（用途取决于 `type`；例如图片使用 `url` + `img_alt`；链接/视频使用 `text` 作为标签/标题）。API 将块映射到统一的 `content` 数组（`paragraph` / `list_item` 带有 `html` 和 `rawText`；列表 HTML 每行是 `<li>…</li>`，客户端会合并为一个 `<ul>`）。chunk 行仅在服务端使用。 |
-| **chunks**         | `paragraph` 或 `list_item` 块内用于细粒度富文本的可选行（`text`、`bold`、`italic`）。`order_index` 对该块内的片段排序。如果未使用，HTML 可以仅由 `content_blocks.raw_text` / `text` 提供。                                                                                                                                                                        |
-| **quiz_questions** | 章节的测验问题。`order_index` 定义显示顺序。                                                                                                                                                                                                                                                                                                                     |
-| **quiz_options**   | 多选题选项。`option_id`（例如 "a"、"b"、"c"）与 API 匹配。`is_correct` 仅用于验证，绝不能暴露给客户端。                                                                                                                                                                                                                                                          |
+| **chunks**         | `paragraph` 或 `list_item` 块内用于细粒度富文本的可选行（`text`、`bold`、`italic`）。`order_index` 对该块内的片段排序。如果未使用，HTML 可以仅由 `content_blocks.raw_text` / `text` 提供。                                                                                                                                                                                                                                            |
+| **quiz_questions** | 章节的测验问题。`order_index` 定义显示顺序。                                                                                                                                                                                                                                                                                                                                                                                          |
+| **quiz_options**   | 多选题选项。`option_id`（例如 "a"、"b"、"c"）与 API 匹配。`is_correct` 仅用于验证，绝不能暴露给客户端。                                                                                                                                                                                                                                                                                                                               |
 
 ## 需求
 
@@ -507,13 +507,13 @@ erDiagram
 
 **Content 数组：** 项目遵循 `content_blocks.order_index`（在每个项目上暴露为 `orderIndex`）。类型与存储和 LMS 需求一致：
 
-| `type`                   | 来源 / 字段                                                                                                                                                        |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `h1`, `h2`, `h3`, `h4`   | `orderIndex`，`text` 中的纯标题文本（来自块的 `text` 列）。                                                                                                        |
+| `type`                   | 来源 / 字段                                                                                                                                                     |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `h1`, `h2`, `h3`, `h4`   | `orderIndex`，`text` 中的纯标题文本（来自块的 `text` 列）。                                                                                                     |
 | `paragraph`, `list_item` | `orderIndex`，`html`（仅在服务端由 `chunks` 渲染），`rawText` 来自 `content_blocks.raw_text`（例如 markdown 源；可以为 `null`）。chunk 行**不会**包含在响应中。 |
-| `image`                  | `orderIndex`，`url`，`alt`（来自 `url`、`img_alt`）。                                                                                                              |
-| `video`                  | `orderIndex`，`url`，`title`（例如来自 `url` 和 `text`）。                                                                                                         |
-| `link`                   | `orderIndex`，`url`，`title`                                                                                                                                       |
+| `image`                  | `orderIndex`，`url`，`alt`（来自 `url`、`img_alt`）。                                                                                                           |
+| `video`                  | `orderIndex`，`url`，`title`（例如来自 `url` 和 `text`）。                                                                                                      |
+| `link`                   | `orderIndex`，`url`，`title`                                                                                                                                    |
 
 每个测验问题的正确答案**不得**出现在此响应中；它只由测验验证端点使用。
 
@@ -601,8 +601,8 @@ erDiagram
 
 #### 课程管理
 
-| Method | Path               | Auth             |
-| ------ | ------------------ | ---------------- |
+| Method | Path               | Auth              |
+| ------ | ------------------ | ----------------- |
 | `POST` | `/api/courses`     | 需要 Bearer token |
 | `PUT`  | `/api/courses/:id` | 需要 Bearer token |
 
@@ -615,11 +615,11 @@ erDiagram
 **请求体：** 将 `title` 和 `slug` 作为**顶层** JSON 属性发送（不要放在 `course` 内）。可选：`description`、`difficulty`。  
 为了与响应保持对称，也可以将相同字段嵌套在 `course` 下（例如 `{ "course": { "title": "...", "slug": "..." } }`）。
 
-| 字段          | 必需 | 描述                                                          |
-| ------------- | ---- | ------------------------------------------------------------- |
-| `title`       | yes  | 非空字符串                                                    |
-| `slug`        | yes  | 唯一 URL slug（模式同上）                                     |
-| `description` | no   | 字符串或省略；可以为 `null`                                   |
+| 字段          | 必需 | 描述                                                            |
+| ------------- | ---- | --------------------------------------------------------------- |
+| `title`       | yes  | 非空字符串                                                      |
+| `slug`        | yes  | 唯一 URL slug（模式同上）                                       |
+| `description` | no   | 字符串或省略；可以为 `null`                                     |
 | `difficulty`  | no   | `beginner`、`intermediate`、`advanced` 之一（默认：`beginner`） |
 
 **请求示例（`Content-Type: application/json`）：**
@@ -661,12 +661,12 @@ erDiagram
 
 **请求体（任意子集）：**
 
-| 字段          | 描述                                      |
-| ------------- | ----------------------------------------- |
-| `title`       | 非空字符串                                |
-| `slug`        | 新的唯一 slug（模式同 POST）              |
-| `description` | 字符串或 `null`                           |
-| `difficulty`  | `beginner` / `intermediate` / `advanced`  |
+| 字段          | 描述                                     |
+| ------------- | ---------------------------------------- |
+| `title`       | 非空字符串                               |
+| `slug`        | 新的唯一 slug（模式同 POST）             |
+| `description` | 字符串或 `null`                          |
+| `difficulty`  | `beginner` / `intermediate` / `advanced` |
 
 **请求示例（`Content-Type: application/json`）** - 至少包含**一个**字段；允许部分更新：
 
@@ -726,11 +726,11 @@ erDiagram
 
 ## 分数分布
 
-| WSOS SECTION | 描述                         | 分数  |
-| ------------ | ---------------------------- | ----- |
-| 1            | 工作组织和自我管理           | 1     |
-| 2            | 沟通和人际交往技能           | 3.25  |
-| 3            | 设计实现                     | 0     |
-| 4            | 前端开发                     | 0     |
-| 5            | 后端开发                     | 25.75 |
-| **Total**    |                              | 30    |
+| WSOS SECTION | 描述               | 分数  |
+| ------------ | ------------------ | ----- |
+| 1            | 工作组织和自我管理 | 1     |
+| 2            | 沟通和人际交往技能 | 3.25  |
+| 3            | 设计实现           | 0     |
+| 4            | 前端开发           | 0     |
+| 5            | 后端开发           | 25.75 |
+| **Total**    |                    | 30    |
