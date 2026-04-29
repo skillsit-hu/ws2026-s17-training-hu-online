@@ -1,0 +1,477 @@
+{
+  "v": 6,
+  "name": "SSA Module C Content Service",
+  "requests": [],
+  "auth": {
+    "authType": "inherit",
+    "authActive": true
+  },
+  "headers": [],
+  "_ref_id": "coll_mn7udpmm_7f34e0f0-d77b-49ba-9ef1-3cb39540263f",
+  "folders": [
+    {
+      "v": 6,
+      "name": "Public Endpoints",
+      "requests": [
+        {
+          "v": "11",
+          "name": "Health Check",
+          "method": "GET",
+          "endpoint": "<<apiUrl>>/health",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "11",
+          "name": "Get Course Catalog",
+          "method": "GET",
+          "endpoint": "<<apiUrl>>/api/courses",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {}
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [],
+      "_ref_id": "coll_mn7udpml_bdd846c9-0d98-466b-8683-06437af462cc",
+      "folders": []
+    },
+    {
+      "v": 6,
+      "name": "Protected - Course Read",
+      "requests": [
+        {
+          "v": "11",
+          "name": "Get Course Details (Authorized)",
+          "method": "GET",
+          "endpoint": "<<apiUrl>>/api/courses/web-development-fundamentals",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IlNTQSJ9.eyJzdWIiOiIxIiwiZXhwIjoyNTI0NjA4MDAwfQ.lgt3R4dJJJFti940kblDtvZ18vXGffhZQmWFUPPzgSY",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "11",
+          "name": "Get Course Details - Missing Token (401)",
+          "method": "GET",
+          "endpoint": "<<apiUrl>>/api/courses/web-development-fundamentals",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "11",
+          "name": "Get Course Details - Unknown Slug (404)",
+          "method": "GET",
+          "endpoint": "<<apiUrl>>/api/courses/this-course-does-not-exist",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<token>>",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {}
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [],
+      "_ref_id": "coll_mn7udpml_9ecd60e5-2615-4a57-9ea4-cb475fb33fd0",
+      "folders": []
+    },
+    {
+      "v": 6,
+      "name": "Protected - Chapter Content",
+      "requests": [
+        {
+          "v": "11",
+          "name": "Get Chapter Content (Authorized)",
+          "method": "GET",
+          "endpoint": "<<apiUrl>>/api/courses/web-development-fundamentals/chapters/1",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<token>>",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "11",
+          "name": "Get Chapter Content - Unknown Chapter (404)",
+          "method": "GET",
+          "endpoint": "<<apiUrl>>/api/courses/web-development-fundamentals/chapters/99999",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<token>>",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {}
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [],
+      "_ref_id": "coll_mn7udpml_8578f48b-322d-4dce-b19c-1acfd9225944",
+      "folders": []
+    },
+    {
+      "v": 6,
+      "name": "Protected - Quiz Validation",
+      "requests": [
+        {
+          "v": "11",
+          "name": "Validate Quiz (Authorized)",
+          "method": "POST",
+          "endpoint": "<<apiUrl>>/api/courses/web-development-fundamentals/chapters/1/quiz/validate",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<token>>",
+              "active": true,
+              "description": ""
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"answers\": [\n    { \"questionId\": 1, \"selectedOptionId\": \"a\" },\n    { \"questionId\": 2, \"selectedOptionId\": \"b\" }\n  ]\n}"
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "11",
+          "name": "Validate Quiz - Invalid Payload (400)",
+          "method": "POST",
+          "endpoint": "<<apiUrl>>/api/courses/web-development-fundamentals/chapters/1/quiz/validate",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<token>>",
+              "active": true,
+              "description": ""
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"answers\": \"not-an-array\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {}
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [],
+      "_ref_id": "coll_mn7udpml_e10fb788-ddd0-43ce-8a88-48014f4ddee1",
+      "folders": []
+    },
+    {
+      "v": 6,
+      "name": "Protected - Course Administration",
+      "requests": [
+        {
+          "v": "11",
+          "name": "Create Course (POST /api/courses)",
+          "method": "POST",
+          "endpoint": "<<apiUrl>>/api/courses",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<token>>",
+              "active": true,
+              "description": ""
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"title\": \"New Course Title\",\n  \"slug\": \"new-course-slug\",\n  \"description\": \"Optional description\",\n  \"difficulty\": \"beginner\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "11",
+          "name": "Create Course - Empty Body",
+          "method": "POST",
+          "endpoint": "<<apiUrl>>/api/courses",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<token>>",
+              "active": true,
+              "description": ""
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{}"
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "11",
+          "name": "Update Course (PUT /api/courses/:id)",
+          "method": "PUT",
+          "endpoint": "<<apiUrl>>/api/courses/1",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<token>>",
+              "active": true,
+              "description": ""
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"title\": \"Updated Title\",\n  \"description\": \"Updated description\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "11",
+          "name": "Update Course - Empty Body (400)",
+          "method": "PUT",
+          "endpoint": "<<apiUrl>>/api/courses/1",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<token>>",
+              "active": true,
+              "description": ""
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{}"
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "11",
+          "name": "Update Course - Unknown ID (404)",
+          "method": "PUT",
+          "endpoint": "<<apiUrl>>/api/courses/99999",
+          "params": [],
+          "headers": [
+            {
+              "key": "Authorization",
+              "value": "Bearer <<token>>",
+              "active": true,
+              "description": ""
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"title\": \"Will Not Update\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {}
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [],
+      "_ref_id": "coll_mn7udpmm_63f7829a-87ab-4130-9566-578d3821b3df",
+      "folders": []
+    }
+  ]
+}

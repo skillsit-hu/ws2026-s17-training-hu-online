@@ -1,0 +1,779 @@
+openapi: 3.0.3
+info:
+  title: SkillShare Academy Main Backend API
+  description: |
+    HTTP API for the **main backend** (LMS): users, course catalog & enrollment,
+    chapter completion, and mentor sessions. Course **content** is served by a separate
+    Content Service; this API stores enrollments and completions using **external**
+    course/chapter IDs from that service.
+
+    **Authentication:** Most routes require `Authorization: Bearer <token>` where the
+    token is issued by `POST /users/login` (HMAC-signed, stored server-side for revocation).
+
+    **Base path:** All API routes below are mounted under `/api/v1` (e.g. `/api/v1/health`).
+  version: 1.0.0
+  contact:
+    name: SkillShare Academy
+
+servers:
+  - url: http://localhost:5001/api/v1
+    description: Local default (`PORT` defaults to 5001 in `01-main-backend`)
+  - url: "{baseUrl}/api/v1"
+    description: Configurable deployment
+    variables:
+      baseUrl:
+        default: http://localhost:5001
+
+tags:
+  - name: Health
+  - name: Meta
+  - name: Users
+    description: Registration, login, logout, and current-user data
+  - name: Courses
+    description: Catalog, enrollment, chapter completion (requires Bearer token)
+  - name: Mentors
+    description: Mentor sessions and booking (requires Bearer token)
+  - name: Control
+    description: Test / ops endpoints (database reset & status; no auth in reference impl.)
+
+security:
+  - bearerAuth: []
+
+paths:
+  /health:
+    get:
+      tags: [Health]
+      summary: Liveness / health check
+      security: []
+      responses:
+        "200":
+          description: Service is up
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, timestamp, version]
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  timestamp:
+                    type: string
+                    format: date-time
+                  version:
+                    type: string
+                    example: 1.0.0
+
+  /:
+    get:
+      tags: [Meta]
+      summary: API discovery
+      description: Returns a human-readable list of available endpoint paths.
+      security: []
+      responses:
+        "200":
+          description: API metadata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: SkillShare Academy API v1.0
+                  endpoints:
+                    type: array
+                    items:
+                      type: string
+
+  /users/register:
+    post:
+      tags: [Users]
+      summary: Register a new learner
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterResponse"
+        "400":
+          description: Validation error or email already registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageError"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /users/login:
+    post:
+      tags: [Users]
+      summary: Login and obtain Bearer token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Invalid credentials or missing fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageError"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /users/logout:
+    post:
+      tags: [Users]
+      summary: Revoke current Bearer token
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logout successful
+        "401":
+          $ref: "#/components/responses/UnauthorizedMessage"
+
+  /users/me:
+    get:
+      tags: [Users]
+      summary: Current user dashboard
+      description: |
+        Returns profile, aggregate stats, recent activity, and mentor session bookings.
+      responses:
+        "200":
+          description: Dashboard payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserMeResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedMessage"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /users/me/enrolled-courses:
+    get:
+      tags: [Users]
+      summary: Course IDs the user is enrolled in
+      description: IDs are **Content Service** (external) course IDs.
+      responses:
+        "200":
+          description: Enrolled course IDs
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [courseIds]
+                properties:
+                  courseIds:
+                    type: array
+                    items:
+                      type: integer
+        "401":
+          $ref: "#/components/responses/UnauthorizedMessage"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /users/me/completed-chapters:
+    get:
+      tags: [Users]
+      summary: Chapter IDs the user has completed
+      description: IDs are **Content Service** (external) chapter IDs.
+      responses:
+        "200":
+          description: Completed chapter IDs
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [chapterIds]
+                properties:
+                  chapterIds:
+                    type: array
+                    items:
+                      type: integer
+        "401":
+          $ref: "#/components/responses/UnauthorizedMessage"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /courses:
+    get:
+      tags: [Courses]
+      summary: Course catalog (with optional filters)
+      description: |
+        Data is aggregated from the Content Service and enriched with enrollment flags
+        for the authenticated user. **Query `difficulty`** is compared case-insensitively
+        to values like `BEGINNER`, `INTERMEDIATE`, `ADVANCED`.
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Substring match on title or description
+        - name: difficulty
+          in: query
+          schema:
+            type: string
+            enum: [BEGINNER, INTERMEDIATE, ADVANCED, beginner, intermediate, advanced]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        "200":
+          description: Paginated slice of courses
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [courses]
+                properties:
+                  courses:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/CourseCatalogItem"
+        "401":
+          $ref: "#/components/responses/UnauthorizedMessage"
+        "500":
+          description: Failed to fetch courses (e.g. Content Service error)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: string
+                    example: COURSES_FETCH_ERROR
+
+  /courses/{id}/enroll:
+    post:
+      tags: [Courses]
+      summary: Enroll in a course
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: External (Content Service) course ID
+      responses:
+        "200":
+          description: Enrollment created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Successfully enrolled in course
+        "400":
+          description: Invalid course ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedMessage"
+        "404":
+          description: Course not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageError"
+        "409":
+          description: Already enrolled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageError"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /courses/{courseId}/chapters/{chapterId}/complete:
+    post:
+      tags: [Courses]
+      summary: Mark a chapter as completed
+      description: |
+        Awards credits to the user and records completion using **external** chapter IDs.
+        The chapter must exist on the course in the Content Service.
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: chapterId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Chapter completed
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [message, creditsEarned, newBalance]
+                properties:
+                  message:
+                    type: string
+                    example: Chapter completed
+                  creditsEarned:
+                    type: integer
+                  newBalance:
+                    type: integer
+                    description: User credit balance after completion
+        "400":
+          description: Invalid course or chapter ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedMessage"
+        "403":
+          description: User not enrolled in the course
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageError"
+        "404":
+          description: Chapter not found for this course
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageError"
+        "409":
+          description: Chapter already completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageError"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /mentors/sessions:
+    get:
+      tags: [Mentors]
+      summary: List mentor sessions
+      responses:
+        "200":
+          description: Available and scheduled sessions
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [sessions]
+                properties:
+                  sessions:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/MentorSession"
+        "401":
+          $ref: "#/components/responses/UnauthorizedMessage"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /mentors/sessions/{id}/book:
+    post:
+      tags: [Mentors]
+      summary: Book a mentor session
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Booking created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [message, booking]
+                properties:
+                  message:
+                    type: string
+                    example: Session booked successfully
+                  booking:
+                    $ref: "#/components/schemas/SessionBooking"
+        "400":
+          description: Invalid session ID or duplicate booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageError"
+        "401":
+          $ref: "#/components/responses/UnauthorizedMessage"
+        "403":
+          description: Insufficient credits
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageError"
+        "404":
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageError"
+        "409":
+          description: Session no longer available
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageError"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /control/reset:
+    post:
+      tags: [Control]
+      summary: Reset database (test / ops)
+      description: |
+        Clears data and re-seeds. **Not intended for production.** Unauthenticated in
+        the reference implementation.
+      security: []
+      responses:
+        "200":
+          description: Reset succeeded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+                    example: success
+        "500":
+          description: Reset failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+                    example: error
+
+  /control/status:
+    get:
+      tags: [Control]
+      summary: Database status snapshot
+      security: []
+      responses:
+        "200":
+          description: Status payload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      totalUsers:
+                        type: integer
+                      totalSessions:
+                        type: integer
+                      totalBookings:
+                        type: integer
+                      availableSessions:
+                        type: integer
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: HMAC-signed token
+      description: |
+        Token from `POST /users/login`. Send as `Authorization: Bearer <token>`.
+
+  responses:
+    UnauthorizedMessage:
+      description: Missing, invalid, revoked, or expired token
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MessageError"
+    InternalError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MessageError"
+
+  schemas:
+    MessageError:
+      type: object
+      properties:
+        message:
+          type: string
+        error:
+          type: string
+        code:
+          type: string
+
+    RegisterRequest:
+      type: object
+      required: [email, password, name]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+        name:
+          type: string
+
+    RegisterResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: User created successfully
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+            email:
+              type: string
+            name:
+              type: string
+            credits:
+              type: integer
+              description: creditBalance (0)
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    LoginResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Login successful
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            email:
+              type: string
+            credits:
+              type: integer
+        token:
+          type: string
+          description: Bearer token for subsequent requests
+
+    CourseCatalogItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        difficulty:
+          type: string
+          enum: [beginner, intermediate, advanced]
+        totalChapters:
+          type: integer
+        totalCredits:
+          type: integer
+        isEnrolled:
+          type: boolean
+
+    MentorSession:
+      type: object
+      properties:
+        id:
+          type: integer
+        mentorName:
+          type: string
+        expertise:
+          type: string
+        experienceLevel:
+          type: string
+          enum: [junior, mid, senior]
+        sessionDate:
+          type: string
+          format: date-time
+        durationMinutes:
+          type: integer
+        creditCost:
+          type: integer
+        isAvailable:
+          type: boolean
+
+    SessionBooking:
+      type: object
+      properties:
+        id:
+          type: integer
+        sessionId:
+          type: integer
+        userId:
+          type: integer
+        status:
+          type: string
+          enum: [pending, confirmed, rejected, completed, cancelled]
+        creditsPaid:
+          type: integer
+        bookedAt:
+          type: string
+          format: date-time
+
+    RecentActivityItem:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [chapter_completed, session_booked]
+        description:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        creditsEarned:
+          type: integer
+        creditsPaid:
+          type: integer
+
+    UserBookingSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        session:
+          type: object
+          properties:
+            id:
+              type: integer
+            mentorName:
+              type: string
+            expertise:
+              type: string
+            experienceLevel:
+              type: string
+            sessionDate:
+              type: string
+              format: date-time
+            durationMinutes:
+              type: integer
+        status:
+          type: string
+        creditsPaid:
+          type: integer
+        bookedAt:
+          type: string
+          format: date-time
+
+    UserMeResponse:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            email:
+              type: string
+            creditBalance:
+              type: integer
+        stats:
+          type: object
+          properties:
+            enrolledCourses:
+              type: integer
+            completedChapters:
+              type: integer
+            totalCreditsEarned:
+              type: integer
+            upcomingBookings:
+              type: integer
+        recentActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecentActivityItem"
+        sessions:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserBookingSummary"

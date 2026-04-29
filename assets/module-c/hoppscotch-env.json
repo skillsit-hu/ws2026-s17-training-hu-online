@@ -1,0 +1,17 @@
+{
+  "id": "9gm4zdsl2jr",
+  "v": 1,
+  "name": "SSA",
+  "variables": [
+    {
+      "key": "token",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IlNTQSJ9.eyJzdWIiOiIxIiwiZXhwIjoyNTI0NjA4MDAwfQ.lgt3R4dJJJFti940kblDtvZ18vXGffhZQmWFUPPzgSY",
+      "secret": false
+    },
+    {
+      "key": "apiUrl",
+      "value": "http://localhost:5000",
+      "secret": false
+    }
+  ]
+}
