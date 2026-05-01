@@ -51,4 +51,4 @@ The module tasks are based on the test projects from the 2026 WorldSkills Hungar
 - [Module C - Backend](https://youtu.be/bKhSXO9md9g)
 - [Module D - Frontend](https://youtu.be/Zz4qD5I6qZc)
 
-![Skills IT](https://httpf.s3.eu-west-1.amazonaws.com/skillsit/skillsit-members-2026-wide.png)
+![Skills IT](/assets/images/wshu-skillsit.png)
